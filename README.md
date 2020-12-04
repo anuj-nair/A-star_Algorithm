@@ -1,2 +1,3 @@
-# A_star_Algorithm
-A Star Algorithm 
+# A Star Algorithm
+
+Implementation A star Algorithm and Visualization with Python

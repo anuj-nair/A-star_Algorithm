@@ -75,7 +75,7 @@ class Node:
     def update_neighbors(self, grid):
         self.neighbors = []
         # Down
-        if self.row < self.total_rows - 1 and not grid[self.row - 1][self.col].is_barrier():
+        if self.row < self.total_rows - 1 and not grid[self.row + 1][self.col].is_barrier():
             self.neighbors.append(grid[self.row + 1][self.col])
 
         if self.row > 0 and not grid[self.row - 1][self.col].is_barrier():  # Up
@@ -110,6 +110,7 @@ def algorthm(draw, grid, start, end):
     open_set = PriorityQueue()
     open_set.put((0, count, start))
     came_from = {}
+    #print("came_from", came_from)
     g_score = {node: float("inf") for row in grid for node in row}
     g_score[start] = 0
     f_score = {node: float("inf") for row in grid for node in row}
@@ -125,15 +126,20 @@ def algorthm(draw, grid, start, end):
         current = open_set.get()[2]
         open_set_hash.remove(current)
 
+        #print("came_from", came_from)
+
         if current == end:
             reconstruct_path(came_from, end, draw)
             end.make_end()
-            return true
+            start.make_start()
+            return True
 
         for neighbor in current.neighbors:
+
+            #print("came_from", came_from)
             temp_g_score = g_score[current] + 1
 
-            if temp_g_score < g_score[neighbors]:
+            if temp_g_score < g_score[neighbor]:
                 came_from[neighbor] = current
                 g_score[neighbor] = temp_g_score
                 f_score[neighbor] = temp_g_score + \
@@ -142,13 +148,13 @@ def algorthm(draw, grid, start, end):
                     count += 1
                     open_set.put((f_score[neighbor], count, neighbor))
                     open_set_hash.add(neighbor)
-
+                    neighbor.make_open()
         draw()
 
         if current != start:
             current.make_closed()
 
-        return False
+    return False
 
 
 def make_grid(rows, width):
@@ -197,10 +203,11 @@ def main(win, width):
     end = None
 
     run = True
-    started = False
+
     while run:
         draw(win, grid, ROWS, width)
         for event in pygame.event.get():
+
             if event.type == pygame.QUIT:
                 run = False
 
@@ -228,15 +235,20 @@ def main(win, width):
                 elif node == end:
                     end = None
 
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE and start and end:
-                for node in row:
-                    node.update_neighbors(grid)
-                algorthm(lambda: draw(win, grid, ROWS, width), grid, start, end)
-            if event.key == pygame.K_c:
-                start = None
-                end = None
-                grid = make_grid(ROWS, width)
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE and start and end:
+
+                    for row in grid:
+                        for node in row:
+                            node.update_neighbors(grid)
+
+                    algorthm(lambda: draw(win, grid, ROWS, width),
+                             grid, start, end)
+                if event.key == pygame.K_c:
+                    start = None
+                    end = None
+                    grid = make_grid(ROWS, width)
+
     pygame.quit()
 
 

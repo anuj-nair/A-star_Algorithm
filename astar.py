@@ -1,3 +1,5 @@
+#!/bin/env python3
+
 import pygame
 import math
 from queue import PriorityQueue
